@@ -80,8 +80,8 @@ app.use(session({
     name: 'trainingApp',
     // secure: true, - Not needed for test environment
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none', - Not needed for test environment
-    domain: 'trainingappserver.uk', - Not needed for test environment
+    sameSite: 'none',
+    domain: 'trainingappserver.uk', 
     httpOnly: false
   },
   unset: 'destroy',
