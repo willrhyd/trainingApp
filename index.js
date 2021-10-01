@@ -49,9 +49,7 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(cors({
   origin: [
-    'https://willrhyd.github.io/trainingapp-prod/#/',
     'https://willrhyd.github.io',
-    'http://willrhyd.github.io/trainingapp-prod/#/',
     'http://localhost:8080',
     'https://rides.trainingappserver.uk'
   ],
@@ -81,7 +79,7 @@ app.use(session({
     secure: true,
     maxAge: 100 * 60 * 60 * 24,
     sameSite: 'none',
-    domain: 'trainingappserver.uk',
+    domain: 'rides.trainingappserver.uk',
     httpOnly: false
   },
   unset: 'destroy',
@@ -97,7 +95,7 @@ function ensureAuthenticated(req, res, next) {
   }
   res.status(401).json({
     msg: "Not logged in"
-  })
+  });
 }
 
 //Connect to database and set the Ride model from databse.js
@@ -128,10 +126,6 @@ function uploadDB(req, res, next) {
 
   next();
 }
-//
-// app.get('/', (req,res) => {
-//   res.send("<h1>Hello World of Sessions</h1>")
-// });
 
 app.get('/showRides/:dateOne.:dateTwo', ensureAuthenticated, async (req, res, next) => {
   console.log(req.session.cookie);
@@ -197,8 +191,6 @@ app.post('/fileUpload', ensureAuthenticated, upload.any('multi-files'), fit.pars
 });
 
 app.post('/register', function(req, res) {
-
-
   if (req.body.password !== req.body.passwordConfirm) {
     return res.status(500).json({
       msg: "Passwords do not match"
