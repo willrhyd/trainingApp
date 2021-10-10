@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(cors({
   origin: [
-    'https://willrhyd.github.io',
+
     'http://localhost:8080',
     'https://rides.trainingappserver.uk'
   ],
@@ -78,10 +78,10 @@ app.use(session({
   cookie: {
     // Comment out secure and samesite for local environment testing
     name: 'trainingApp',
-    // secure: true,
+    secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    // sameSite: 'none',
-    domain: 'localhost',
+    sameSite: 'none',
+    domain: 'trainingappserver',
     httpOnly: false
   },
   unset: 'destroy',
