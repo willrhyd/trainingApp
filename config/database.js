@@ -21,12 +21,17 @@ const UserSchema = new Schema({
 });
 
 const RideSchema = new Schema({
+  completion: Number,
   data: String,
   date: Date,
-  distance: Number,
-  duration: Number,
-  nPwr: Number,
-  tss: Number,
+  completedDistance: Number,
+  completedDuration: Number,
+  completednPwr: Number,
+  completedTss: Number,
+  plannedDistance: Number,
+  plannedDuration: Number,
+  plannedPwr: Number,
+  plannedTss: Number,
   user: String,
 });
 

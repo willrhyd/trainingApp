@@ -18,6 +18,7 @@ const path = require('path');
 const shortid = require('shortid');
 const fit = require('./fit');
 const fs = require('fs');
+
 require('dotenv').config();
 const port = process.env.PORT || 3000;
 
@@ -75,11 +76,12 @@ app.use(session({
     collectionName: 'sessions' // See below for details
   }),
   cookie: {
+    // Comment out secure and samesite for local environment testing
     name: 'trainingApp',
-    secure: true,
+    // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none',
-    domain: 'trainingappserver.uk',
+    // sameSite: 'none',
+    domain: 'localhost',
     httpOnly: false
   },
   unset: 'destroy',
@@ -104,31 +106,98 @@ connection.connect;
 const Ride = connection.Ride;
 const User = connection.User;
 
-function uploadDB(req, res, next) {
-  req.parsedFiles.forEach(file => {
+async function uploadDBCompletedRide(req, res, next) {
+  req.parsedFiles.forEach(async (file) => {
     const nPwr = fit.getNP(file);
     const duration = file.sessions[0].total_timer_time;
-    console.log(file);
-    // console.log(req.user.ftp)
-    const dbRide = new Ride({
-      data: JSON.stringify(file.sessions[0]),
-      date: file.sessions[0].timestamp,
-      distance: file.sessions[0].total_distance,
-      duration: duration,
-      nPwr: nPwr,
-      tss: fit.getTss(req.user.ftp, nPwr, duration),
+    const completedTss = fit.getTss(req.user.ftp, nPwr, duration);
+    let d1 = new Date(file.sessions[0].timestamp);
+    let d2 = new Date(file.sessions[0].timestamp);
+
+    d1.setHours(0,0,0);
+    d2.setHours(23,59,59);
+    const filter = {
+      date: {
+        $gt: d1,
+        $lt: d2,
+      },
       user: req.user.username
+    };
+
+    let plannedRide;
+
+    try{
+      const pRide = await Ride.findOne(filter);
+      console.log(pRide)
+      if(pRide != undefined){
+
+      const completion = pRide.plannedTss/completedTss;
+      // console.log(completion)
+      let update = {
+        completion: completion,
+        data: JSON.stringify(file.sessions[0]),
+        date: file.sessions[0].timestamp,
+        completedDistance: file.sessions[0].total_distance,
+        completedDuration: duration,
+        completednPwr: nPwr,
+        completedTss: completedTss,
+      };
+      const cRide = await Ride.findOneAndUpdate(filter, update, {
+        new: true,
+      })
+    } else {
+      const cRide = new Ride({
+        completion: -1,
+        data: JSON.stringify(file.sessions[0]),
+        date: file.sessions[0].timestamp,
+        completedDistance: file.sessions[0].total_distance,
+        completedDuration: duration,
+        completednPwr: nPwr,
+        completedTss: completedTss,
+        plannedDistance: 0,
+        plannedDuration: 0,
+        // plannednPwr:req.body.nPwr,
+        plannedTss: 0,
+        user: req.user.username,
+      });
+      cRide.save();
+    }
+      // console.log(cRide);
+
+    } catch (err){
+      console.log(err)
+    }
+});
+next();
+}
+
+function uploadDBPlannedRide(req, res, next) {
+  // Set Date to 12:00 pm so that it gets added to the Weeks array in calendar.vue,
+  // at the "attachRidesToWeeks()" method.
+  let d = new Date(req.body.date);
+  d.setHours(12)
+  // console.log(d);
+    const dbRide = new Ride({
+      completion: 0,
+      date: d,
+      plannedDistance:req.body.distance,
+      plannedDuration:req.body.time,
+      // plannednPwr:req.body.nPwr,
+      plannedTss: req.body.tss,
+      completedDistance: null,
+      completedDuration: null,
+      completednPwr: null,
+      completedTss: null,
+      user: req.user.username,
     });
     dbRide.save(function(err) {
       if (err) console.log(err);
     });
-  });
-
   next();
 }
 
 app.get('/showRides/:dateOne.:dateTwo', ensureAuthenticated, async (req, res, next) => {
-  console.log(req.session.cookie);
+  console.log();
 
   var rideArr = [];
   let rides = await Ride.find({
@@ -143,15 +212,20 @@ app.get('/showRides/:dateOne.:dateTwo', ensureAuthenticated, async (req, res, ne
     }
     for (var i = 0; i < docs.length; i++) {
       var rideObj = new Object();
-      rideObj.date = docs[i].date;
-      rideObj.distance = docs[i].distance;
-      rideObj.duration = docs[i].duration;
-      rideObj.np = docs[i].nPwr;
-      rideObj.tss = docs[i].tss;
-      rideObj.id = docs[i]._id;
-      rideArr.push(rideObj);
+        rideObj.completion = docs[i].completion;
+        rideObj.date = docs[i].date;
+        rideObj.completedDistance = docs[i].completedDistance;
+        rideObj.completedDuration = docs[i].completedDuration;
+        rideObj.completednPwr = docs[i].completednPwr;
+        rideObj.completedTss = docs[i].completedTss;
+        rideObj.plannedDistance = docs[i].plannedDistance;
+        rideObj.plannedDuration = docs[i].plannedDuration;
+        // rideObj.np = docs[i].completednPwr;
+        rideObj.plannedTss = docs[i].plannedTss;
+        rideObj.id = docs[i]._id;
+        rideArr.push(rideObj);
     }
-    console.log(rideArr);
+    // console.log(rideArr);
     res.locals.rideArray = rideArr;
     res.send(rideArr);
 
@@ -163,17 +237,23 @@ app.get('/showRide/:id', async function(req, res) {
   let rides = await Ride.find({
     _id: req.params.id
   }, function(err, docs) {
-    // console.log(docs[0])
     if (err) {
       console.log(err);
     }
-    let rideObj = {
-      date: docs[0].date,
-      distance: docs[0].distance,
-      duration: docs[0].duration,
-      np: docs[0].nPwr,
-      id: docs[0]._id,
-    };
+    var rideObj = new Object();
+        rideObj.completion = docs[0].completion;
+        rideObj.date = docs[0].date;
+        rideObj.completedDistance = docs[0].completedDistance;
+        rideObj.completedDuration = docs[0].completedDuration;
+        rideObj.completednPwr = docs[0].completednPwr;
+        rideObj.completedTss = docs[0].completedTss;
+        rideObj.plannedDistance = docs[0].plannedDistance;
+        rideObj.plannedDuration = docs[0].plannedDuration;
+        // rideObj.np = docs[0].completednPwr;
+        rideObj.plannedTss = docs[0].plannedTss;
+        rideObj.id = docs[0]._id;
+
+
     res.locals.rideObj = rideObj;
 
   });
@@ -183,11 +263,18 @@ app.get('/showRide/:id', async function(req, res) {
 }
 });
 
-app.post('/fileUpload', ensureAuthenticated, upload.any('multi-files'), fit.parseFIT, uploadDB, function(req, res) {
+app.post('/fileUpload', ensureAuthenticated, upload.any('multi-files'), fit.parseFIT, uploadDBCompletedRide, function(req, res) {
 
   console.log('Ride saved to DB');
   res.sendStatus(200);
   //  uploadDB,
+});
+
+app.post('/adHocUpload', ensureAuthenticated, uploadDBPlannedRide, function(req, res) {
+
+  console.log('Ride saved to DB');
+  res.sendStatus(200);
+
 });
 
 app.post('/register', function(req, res) {
@@ -229,12 +316,18 @@ app.post('/login', passport.authenticate('local'), ensureAuthenticated, function
 
 });
 
-app.get('/logout', function(req, res) {
-  req.logout();
-  res.status(200).json({
-    msg: "Signed out successfully"
+
+
+app.get('/logout', async function(req, res) {
+
+  req.session.destroy(function (err) {
+    console.log("Signed out successfully")
+    res.status(200).json({
+      msg: "Signed out successfully"
+    });
+    });
   });
-});
+
 
 app.delete('/file_delete/:id', ensureAuthenticated, async function(req, res) {
   console.log(req.params.id)

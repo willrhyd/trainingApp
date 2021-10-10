@@ -78,6 +78,6 @@ export default {
 .uploadContainer{
   text-align: center;
   display: inline-block;
-  
+
 }
 </style>

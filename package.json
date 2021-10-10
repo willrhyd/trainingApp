@@ -20,6 +20,8 @@
     "fit-file-parser": "^1.9.0",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
+    "garmin-connect": "^1.4.1",
+    "garmin-connect-scraper": "^1.1.1",
     "mongo": "^0.1.0",
     "mongodb": "^3.6.9",
     "mongoose": "^5.13.8",
@@ -27,6 +29,10 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
+    "puppeteer": "^10.4.0",
+    "puppeteer-debug": "^2.0.0",
+    "puppeteer-extra": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.8.1",
     "shortid": "^2.2.16"
   },
   "devDependencies": {

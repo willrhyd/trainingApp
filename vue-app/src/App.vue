@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-
-
     <!-- <rideList msg="this is where the calendar goes"/> -->
     <router-view/>
   </div>
@@ -22,7 +20,7 @@ export default {
 
 <style>
 #app {
-  
+
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

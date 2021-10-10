@@ -1,0 +1,7 @@
+Once dist is compiled, push to gh-pages subtree on github to publish:
+
+git add vue-app/dist
+
+git commit -m "adding dist"
+
+git push origin `git subtree split --prefix vue-app/dist main`:gh-pages --force

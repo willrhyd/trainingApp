@@ -71,7 +71,7 @@ function de_Lap_power(activity) {
   // console.log(activity);
   var block_power = [];
   // console.log(activity.sessions.laps[i].records)
-  console.log(activity.sessions[0]);
+  // console.log(activity.sessions[0]);
   for (i in activity.sessions[0].laps) {
     for (j in activity.sessions[0].laps[i].records) {
       block_power.push(activity.sessions[0].laps[i].records[j].power);
@@ -134,7 +134,7 @@ function rideNormalisedPower(activity) {
 
 function getTss(ftp, np, duration) {
   // TSS = (sec x NP® x IF®)/(FTP x 3600) x 100
-  console.log(ftp, np, duration);
+  // console.log(ftp, np, duration);
   return ((duration * np * (np / ftp)) / (ftp * 3600)) * 100;
 }
 
@@ -152,7 +152,7 @@ function checkForRide(rides, checkDate) {
     if (rideDate.toDateString() == checkDate.toDateString()) {
 
       match = 1;
-      tss = rides[j].tss
+      tss = rides[j].completedTss;
       break;
     } else {
       match = 0;
@@ -161,7 +161,7 @@ function checkForRide(rides, checkDate) {
   return {
     match: match,
     tss: tss
-  }
+  };
 }
 // function buildPmcArray(rides) {
 //

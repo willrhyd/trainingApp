@@ -39,8 +39,8 @@ export default {
    },
   methods: {
     ridesSubmitting(submitting) {
-      console.log('Submitting event triggered: ' + submitting)
       this.submittingRides = submitting;
+      this.$emit('ridesSubmitted');
     },
      async logout(){
        await this.$store.dispatch('LogOut');

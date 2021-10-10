@@ -82,6 +82,7 @@ export default{
   padding: 50px;
   margin-top: -200px;
   margin-left: -200px;
+  z-index:2;
 }
 
 .fieldLabel{
