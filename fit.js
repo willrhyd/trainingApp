@@ -205,7 +205,7 @@ function buildPmcArray(rides) {
 
     // Build the data array with date and ctl value.
     if (rideCheck.match == 1) {
-      ctlToday = ctlYesterday + ((rideCheck.completedTss - ctlYesterday) / (42));
+      ctlToday = ctlYesterday + ((rideCheck.tss - ctlYesterday) / (42));
       data.push({
         date: d.toLocaleDateString("en-gb", dateOptions),
         ctl: ctlToday
