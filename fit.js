@@ -4,10 +4,10 @@ const EasyFit = require('./node_modules/easy-fit/dist/easy-fit.js').default;
 const fs = require('fs');
 
 function parseFIT(req, res, next) {
-req.parsedFiles =[];
+  req.parsedFiles = [];
   fs.readdir(`./temp/${req.user.username}`, (err, files) => {
 
-    for(var i = 0; i < files.length; i++) {
+    for (var i = 0; i < files.length; i++) {
       var file = files[i];
       console.log(`./temp/${req.user.username}/${file}`);
       fs.readFile(`./temp/${req.user.username}/${file}`, function(err, content) {
@@ -27,27 +27,27 @@ req.parsedFiles =[];
           if (error) {
             console.log(error);
           } else {
-// Difficulties building the array because callbacks only returning once the for loop has completed,
-// maybe a promise would work better?
+            // Difficulties building the array because callbacks only returning once the for loop has completed,
+            // maybe a promise would work better?
             req.parsedFiles.push(data.activity)
-            if(req.parsedFiles.length == files.length){
+            if (req.parsedFiles.length == files.length) {
               next();
             }
           }
           // console.log(req.parsedFiles[0]);
         });
       });
-      fs.unlink(`./temp/${req.user.username}/${file}`, (err) =>{
+      fs.unlink(`./temp/${req.user.username}/${file}`, (err) => {
         if (err) {
           console.error(err)
           return
         }
       });
-    }    // console.log(req.parsedFiles[0]);
+    } // console.log(req.parsedFiles[0]);
     // console.log(parsedArray);
   });
-// console.log(req.parsedFiles);
-// next();
+  // console.log(req.parsedFiles);
+  // next();
 }
 
 function getNP(activity) {
@@ -139,8 +139,11 @@ function getTss(ftp, np, duration) {
 }
 
 function checkForRide(rides, checkDate) {
-  var match;
-  var tss;
+  let check = {
+    match: 0,
+    tss: 0
+  }
+
   for (var j = 0; j < rides.length; j++) {
     rideDate = new Date(Date.parse(rides[j].date));
     rideDate.setHours(0, 0, 0);
@@ -148,37 +151,37 @@ function checkForRide(rides, checkDate) {
     // console.log("Ride Date: " + rideDate);
     // console.log("Check Date: " + checkDate);
     // console.log("Ride TSS: " + rides[j].tss);
+    console.log(`Ride Date: ${rideDate}  Check Date: ${checkDate}`)
+
 
     if (rideDate.toDateString() == checkDate.toDateString()) {
+      // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
+      check.match = 1;
+      console.log(rides[j].plannedTss || rides[j].completedTss);
+      if (rides[j].completedTss != 0) {
+        check.tss = rides[j].completedTss;
+      }
+      if (rides[j].plannedTss) {
+        check.tss = rides[j].plannedTss;
+      }
 
-      match = 1;
-      tss = rides[j].completedTss;
-      break;
-    } else {
-      match = 0;
-    }
+    } 
+
+
+
   }
-  return {
-    match: match,
-    tss: tss
-  };
+  return check;
 }
-// function buildPmcArray(rides) {
-//
-//   return buildCtl(rides)
-// }
-
-
 
 // Doesn't handle multiple rides on one day yet
-function buildPmcArray(rides) {
+function buildPmcArray(rides, projection) {
 
   // If function to cover edge case of no rides saved
-  if (rides == 0){
+  if (rides == 0) {
     let data = [];
-    for (let i = 150; i>0; i--){
+    for (let i = 150; i > 0; i--) {
       let d = new Date();
-      d.setDate(d.getDate()- i);
+      d.setDate(d.getDate() - i);
       data.push({
         date: d.toLocaleDateString("en-gb", dateOptions),
         ctl: 0
@@ -191,17 +194,28 @@ function buildPmcArray(rides) {
   var chartStart = new Date(Date.parse(rides[0].date));
   var chartEnd = new Date();
 
+  const forecast = Number(projection);
+  chartEnd.setDate(chartEnd.getDate() + (forecast));
+
   var dates = [];
   var data = [];
   var ctlToday = 0;
   var ctlYesterday = 0;
-  var rideCheck;
-  var dateOptions = {year: "numeric", month: "short", day: "numeric"};
-  for (var d = new Date(chartStart); d <= new Date(); d.setDate(d.getDate() + 1)) {
+
+  var dateOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  };
+
+  for (var d = new Date(chartStart); d <= chartEnd; d.setDate(d.getDate() + 1)) {
     d.setHours(0, 0, 0);
 
+
     // For each day, check whether there's a ride that matches that day
-    rideCheck = checkForRide(rides, d);
+    const rideCheck = checkForRide(rides, d);
+    console.log(rideCheck)
+
 
     // Build the data array with date and ctl value.
     if (rideCheck.match == 1) {
@@ -210,7 +224,7 @@ function buildPmcArray(rides) {
         date: d.toLocaleDateString("en-gb", dateOptions),
         ctl: ctlToday
       });
-      rideMatch = 1;
+
       ctlYesterday = ctlToday;
     }
 
@@ -224,6 +238,7 @@ function buildPmcArray(rides) {
     }
 
   }
+
   return data;
 }
 

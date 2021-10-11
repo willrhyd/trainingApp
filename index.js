@@ -76,12 +76,12 @@ app.use(session({
     collectionName: 'sessions' // See below for details
   }),
   cookie: {
-    // Comment out secure and samesite for local environment testing
+    // Comment out secure and samesite for local environment testing. Change 'trainingappserver.uk' to 'localhost'.
     name: 'trainingApp',
-    secure: true,
+    // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none',
-    domain: 'trainingappserver.uk',
+    // sameSite: 'none',
+    domain: 'localhost',
     httpOnly: false
   },
   unset: 'destroy',
@@ -344,14 +344,16 @@ app.delete('/file_delete/:id', ensureAuthenticated, async function(req, res) {
   }
 });
 
-app.get('/pmc/:user', ensureAuthenticated, async function(req, res) {
+app.get('/pmc/:user.:projection', ensureAuthenticated, async function(req, res) {
   try {
     var rides = await Ride.find({
       user: req.user.username
     }).sort({
       date: 'asc'
     });
-      var data = fit.pmc(rides);
+
+      const projection = req.params.projection;
+      var data = fit.pmc(rides, projection);
       console.log(data)
       res.send(data);
 

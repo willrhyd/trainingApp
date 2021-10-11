@@ -3,9 +3,9 @@
   <form @submit.prevent='changeView'>
     <label>Trailing Days</label>
     <input type='text' class='form-control' v-model='trailingDays' placeholder='Number of trailing days' />
-<!-- Forecast days needs configuring on backend -->
-    <!-- <label>Forecast Days</label>
-    <input type='text' class='form-control' v-model='forecastDays' placeholder='Number of forecast days' /> -->
+
+    <label>Forecast Days</label>
+    <input type='text' class='form-control' v-model='forecastDays' placeholder='Number of forecast days' />
     <button type='submit'>Update</button>
   </form>
   <canvas id="pmc"></canvas>
@@ -19,8 +19,8 @@ export default {
   name: 'pmc',
   data(){
     return {
-      trailingDays: 20,
-      forecastDays: 15,
+      trailingDays: 50,
+      forecastDays: 25,
       pmc: null,
       pmcData: {
         type: "line",
@@ -33,6 +33,14 @@ export default {
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
               borderWidth: 3
+            },
+            {
+              label: "Projected CTL",
+              data: null,
+              borderColor: "#36495d",
+              borderDash: [10,5],
+              borderWidth: 3
+
             },
             {
               label: "ATL",
@@ -50,7 +58,13 @@ export default {
             },
           ]
         },
+
         options: {
+          elements:{
+            point:{
+                      radius: 0
+                  }
+          },
           responsive: true,
           lineTension: 1,
           scales: {
@@ -75,43 +89,78 @@ export default {
     async fetchPmc(){
       // const ctx = document.getElementById('pmc');
       var labels = [];
-      var ctl = [];
+      var completedCtl = [];
+      var projectedCtl = [];
 
       try{
         // The API returns a 2d array containing CTL, then ATL, then TSB values
-        let pmc = await axios.get('/pmc/' + this.user);
-        for (var i = 1; i <= this.trailingDays; i++){
-          var arrLen = pmc.data.length
+        let pmc = await axios.get('/pmc/' + this.user + "." + this.forecastDays);
+        let startDate = new Date(pmc.data[0].date)
+        // let endDate = new Date(pmc.data[pmc.data.length-1].date)
+        let today = new Date()
+        const todayPosn = Math.round((today - startDate)/86400000);
 
-          labels.unshift(pmc.data[arrLen-i].date)
-          ctl.unshift(pmc.data[arrLen-i].ctl);
+        // Push data entries to the completed portion of the PMC
+        for (let i = 0; i <= this.trailingDays; i++){
+
+          labels.unshift(pmc.data[todayPosn - i].date)
+          completedCtl.unshift(pmc.data[todayPosn - i].ctl);
+          projectedCtl.unshift(pmc.data[todayPosn - i].ctl);
         }
+        this.pmcData.data.datasets[0].data = completedCtl;
+
+        // Push Data entries to the projected portion of the PMC
+        for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
+          // var arrLen = pmc.data.length
+
+          labels.push(pmc.data[i].date)
+          projectedCtl.push(pmc.data[i].ctl);
+        }
+        this.pmcData.data.datasets[1].data = projectedCtl;
+
       } catch(err) {
         console.log(err)
       }
       this.pmcData.data.labels = labels;
-      this.pmcData.data.datasets[0].data = ctl;
-
     },
     // Redraw chart based on user selected periods
     async changeView() {
-      var labels = [];
-      var ctl = [];
 
-      // Work on PMC so you can look at a date range and even forecast
+      var labels = [];
+      var completedCtl = [];
+      var projectedCtl = [];
+
       try{
-        let pmc = await axios.get('/pmc/' + this.user);
-        for (var i = 1; i <= this.trailingDays; i++){
-          var arrLen = pmc.data.length
-          console.log(pmc.data[arrLen-i].date)
-          labels.unshift(pmc.data[arrLen-i].date)
-          ctl.unshift(pmc.data[arrLen-i].ctl);
-      }
-    } catch(err) {
+        // The API returns a 2d array containing CTL, then ATL, then TSB values
+        let pmc = await axios.get('/pmc/' + this.user + "." + this.forecastDays);
+        let startDate = new Date(pmc.data[0].date)
+        // let endDate = new Date(pmc.data[pmc.data.length-1].date)
+        let today = new Date()
+        const todayPosn = Math.round((today - startDate)/86400000);
+
+        // Push data entries to the completed portion of the PMC
+        for (let i = 0; i <= this.trailingDays; i++){
+
+          labels.unshift(pmc.data[todayPosn - i].date)
+          completedCtl.unshift(pmc.data[todayPosn - i].ctl);
+          projectedCtl.unshift(pmc.data[todayPosn - i].ctl);
+        }
+        this.pmcData.data.datasets[0].data = completedCtl;
+
+        // Push Data entries to the projected portion of the PMC
+        for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
+          // var arrLen = pmc.data.length
+
+          labels.push(pmc.data[i].date)
+          projectedCtl.push(pmc.data[i].ctl);
+        }
+        this.pmcData.data.datasets[1].data = projectedCtl;
+
+      } catch(err) {
         console.log(err)
       }
       this.pmcData.data.labels = labels;
-      this.pmcData.data.datasets[0].data = ctl;
+
       this.pmc.update();
 }
   },
