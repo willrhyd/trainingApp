@@ -29,10 +29,6 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "puppeteer": "^10.4.0",
-    "puppeteer-debug": "^2.0.0",
-    "puppeteer-extra": "^3.2.3",
-    "puppeteer-extra-plugin-stealth": "^2.8.1",
     "shortid": "^2.2.16"
   },
   "devDependencies": {
