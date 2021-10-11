@@ -352,6 +352,7 @@ app.get('/pmc/:user', ensureAuthenticated, async function(req, res) {
       date: 'asc'
     });
       var data = fit.pmc(rides);
+      console.log(data)
       res.send(data);
 
   } catch (err) {
