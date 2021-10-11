@@ -175,7 +175,7 @@ function uploadDBPlannedRide(req, res, next) {
   // Set Date to 12:00 pm so that it gets added to the Weeks array in calendar.vue,
   // at the "attachRidesToWeeks()" method.
   let d = new Date(req.body.date);
-  d.setHours(23 59 59)
+  d.setHours(23, 59, 59);
   // console.log(d);
     const dbRide = new Ride({
       completion: 0,
