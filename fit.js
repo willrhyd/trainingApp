@@ -142,34 +142,33 @@ function checkForRide(rides, checkDate) {
   let check = {
     match: 0,
     tss: 0
-  }
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0);
 
   for (var j = 0; j < rides.length; j++) {
     rideDate = new Date(Date.parse(rides[j].date));
     rideDate.setHours(0, 0, 0);
 
-    // console.log("Ride Date: " + rideDate);
-    // console.log("Check Date: " + checkDate);
-    // console.log("Ride TSS: " + rides[j].tss);
-    console.log(`Ride Date: ${rideDate}  Check Date: ${checkDate}`)
 
-
-    if (rideDate.toDateString() == checkDate.toDateString()) {
-      // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
-      check.match = 1;
-      console.log(rides[j].plannedTss || rides[j].completedTss);
-      if (rides[j].completedTss != 0) {
-        check.tss = rides[j].completedTss;
+    if( checkDate >= today){
+      if (rideDate.toDateString() == checkDate.toDateString()) {
+        // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
+          check.match = 1;
+          check.tss = rides[j].plannedTss;
       }
-      if (rides[j].plannedTss) {
-        check.tss = rides[j].plannedTss;
+    }
+    if( checkDate < today){
+      if (rideDate.toDateString() == checkDate.toDateString()) {
+        // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
+        if(rides[j].completedTss){
+          check.match = 1;
+          check.tss = rides[j].completedTss;
+        }
+        }
       }
-
-    } 
-
-
-
-  }
+    }
   return check;
 }
 
