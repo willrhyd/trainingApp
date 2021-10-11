@@ -57,7 +57,7 @@ export default {
       // Sort out date formatting from UK format to US format, then create Date object
       let ukDateString = this.formData.date
       const splitDate = ukDateString.split('/');
-      const month = splitDate[1]-1;
+      const month = splitDate[1] - 1;
       let usFormatDate = new Date(splitDate[2], month, splitDate[0])
       this.formData.date = usFormatDate;
 
