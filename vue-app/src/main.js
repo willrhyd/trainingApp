@@ -8,6 +8,11 @@ import store from './store/store.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlusSquare } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import VueMoment from "vue-moment";
+import {moment} from "moment-timezone";
+
+
+Vue.use(VueMoment, { moment });
 
 library.add(faPlusSquare);
 

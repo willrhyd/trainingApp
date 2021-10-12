@@ -78,10 +78,10 @@ app.use(session({
   cookie: {
     // Comment out secure and samesite for local environment testing. Change 'trainingappserver.uk' to 'localhost'.
     name: 'trainingApp',
-    secure: true,
+    // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none',
-    domain: 'trainingappserver.uk',
+    // sameSite: 'none',
+    domain: 'localhost',
     httpOnly: false
   },
   unset: 'destroy',

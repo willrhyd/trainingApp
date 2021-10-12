@@ -13,7 +13,7 @@
     </div>
     <div class="dataFieldValues">
       <form ref="newRideForm">
-        <input class="dataFieldValueInput" placeholder="Date" v-model="formData.date"/>
+        <input class="dataFieldValueInput" placeholder="Date" v-model="clickedDateUk"/>
         <input class="dataFieldValueInput" placeholder="Distance" v-model="formData.distance"/>
         <input class="dataFieldValueInput" placeholder="Time" v-model="formData.time"/>
         <input class="dataFieldValueInput" placeholder="TSS" v-model="formData.tss"/>
@@ -38,10 +38,13 @@ import axios from 'axios';
 export default {
   name: "adHocUpload",
   props: ['clickedDate'],
+  computed:{
+    clickedDateUk: function(){return this.clickedDate.toLocaleDateString('en-gb')},
+  },
   data() {
     return {
       formData: {
-        date: this.clickedDate.toLocaleDateString('en-gb'),
+        date: this.clickedDate,
         distance: null,
         time: null,
         tss: null,
@@ -54,12 +57,6 @@ export default {
     },
     async adHocUploadSaveAndClose(){
       this.$refs.newRideForm.submit()
-      // Sort out date formatting from UK format to US format, then create Date object
-      let ukDateString = this.formData.date
-      const splitDate = ukDateString.split('/');
-      const month = splitDate[1] - 1;
-      let usFormatDate = new Date(splitDate[2], month, splitDate[0])
-      this.formData.date = usFormatDate;
 
       try{
       let submit = await axios.post('/adHocUpload', this.formData);
@@ -74,6 +71,9 @@ export default {
           console.log(err);
         }
       },
+},
+created(){
+  console.log(this.clickedDate)
 }
 }
 </script>

@@ -45,7 +45,7 @@
 
         </div>
         <div id="adHocPlus" @click="addToDate();">
-          <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(new Date(day.date), true);" />
+          <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(day.date, true);" />
         </div>
 
       </div>
@@ -143,7 +143,7 @@ export default {
           var d1 = new Date(day.date)
           var d2 = new Date(day.date)
           d1.setHours(0, 0, 0)
-          d2.setHours(23, 59, 59);
+          d2.setHours(23, 59, 59, 999);
           if (this.rides != null) {
             this.rides.forEach(ride => {
 
