@@ -236,7 +236,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i -2)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -252,7 +252,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i - 3)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)

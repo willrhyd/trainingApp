@@ -71,7 +71,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 
-  store: MongoStore.create({
+    store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     collectionName: 'sessions' // See below for details
   }),
@@ -80,7 +80,7 @@ app.use(session({
     name: 'trainingApp',
     // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    // sameSite: 'none',
+    sameSite: 'none',
     domain: 'localhost',
     httpOnly: false
   },
