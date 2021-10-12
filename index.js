@@ -78,10 +78,10 @@ app.use(session({
   cookie: {
     // Comment out secure and samesite for local environment testing. Change 'trainingappserver.uk' to 'localhost'.
     name: 'trainingApp',
-    // secure: true,
+    secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    // sameSite: 'none',
-    domain: 'localhost',
+    sameSite: 'none',
+    domain: 'trainingappserver.uk',
     httpOnly: false
   },
   unset: 'destroy',
@@ -142,7 +142,7 @@ async function uploadDBCompletedRide(req, res, next) {
         completednPwr: nPwr,
         completedTss: completedTss,
       };
-      const cRide = await Ride.findOneAndUpdate(filter, update, {
+      const cRide = await Ride.findOneAndUpdate({_id: pRide.id}, update, {
         new: true,
       })
     } else {

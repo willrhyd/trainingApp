@@ -267,7 +267,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i -4)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -281,7 +281,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i - 5)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -295,7 +295,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i - 6)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -309,7 +309,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i)
+                day.date.setDate(this.view.getDate() - i - 7)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
