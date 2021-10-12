@@ -80,7 +80,7 @@ app.use(session({
     name: 'trainingApp',
     // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none',
+    // sameSite: 'none',
     domain: 'localhost',
     httpOnly: false
   },
@@ -115,7 +115,7 @@ async function uploadDBCompletedRide(req, res, next) {
     let d2 = new Date(file.sessions[0].timestamp);
 
     d1.setHours(0,0,0);
-    d2.setHours(23,59,59);
+    d2.setHours(23,59,59, 999);
     const filter = {
       date: {
         $gt: d1,
@@ -175,7 +175,7 @@ function uploadDBPlannedRide(req, res, next) {
   // Set Date to 12:00 pm so that it gets added to the Weeks array in calendar.vue,
   // at the "attachRidesToWeeks()" method.
   let d = new Date(req.body.date);
-  d.setHours(23, 59, 59);
+  d.setHours(15, 0, 0);
   // console.log(d);
     const dbRide = new Ride({
       completion: 0,
