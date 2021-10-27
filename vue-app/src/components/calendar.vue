@@ -4,60 +4,65 @@
 
   <h3 class="visibleEnd" v-if="visibleEnd">{{visibleEnd.toLocaleString('default', {year: 'numeric', month: 'long', day: 'numeric'})}}</h3>
 
+  <div class="grid-container">
+    <div class="sidebar" ref="sidebar">
+      <singleRideView v-if="singleRideVisible" v-on:closeSingleView="singleRideViewToggle(false); " @rideDeletionEvent="attachRidesToWeeks">
+      </singleRideView>
 
-  <div class="calendar" ref='cal'>
-    <div class="week" id="weekdays">
-      <div class="weekday">Monday</div>
-      <div class="weekday ">Tuesday</div>
-      <div class="weekday ">Wednesday</div>
-      <div class="weekday ">Thursday</div>
-      <div class="weekday ">Friday</div>
-      <div class="weekday ">Saturday</div>
-      <div class="weekday ">Sunday</div>
+      <adHocUpload v-if="adHocUplodVisible" :clickedDate="adHocDateProp" v-on:closeAdHocUpload="adHocUploadToggle(false); toggleSidebar();" v-on:closeAdHocUploadAndSave="adHocUploadToggle(false); refreshRides();">
+
+      </adHocUpload>
+
     </div>
 
-    <div id='loadingNotification' v-if='loading == "loading"' ref='loadingNotification'>
-      Loading
-    </div>
-
-    <div class="week" v-for="week in weeks" :key="week[0].date.toDateString()" :id="week[0].date">
-      <div class="day" v-for="day in week" :key="day.date.toDateString()">
-        <div class="dayDate" v-if="day.date.getDate()==1">
-          <!-- Add "monthFirst" class to span to make 1st of each month more visisble on the grid-->
-          <span class="monthFirst">{{day.date.getDate()}} {{day.date.toLocaleString('default', { month: 'short' })}}</span>
-        </div>
-        <div class="dayDate" v-else>
-          {{day.date.getDate()}}
-        </div>
-        <div v-for="activity in day.activities" :key="activity.id" class="activity" @click="fetchSingleRide(activity.id, true);">
-          <div v-if="activity.completion == 0" class='plannedRide'>
-            Planned Ride
-            <p>Dist: {{Math.round(activity.plannedDistance)}}km</p>
-            <!-- <p>NP: {{Math.round(activity.np)}}w</p> -->
-            <!-- <p>TSS: {{Math.round(activity.plannedTss)}}</p> -->
-          </div>
-          <div v-if="activity.completion > 0 || activity.completion== -1" class="completed" :class="{ 'green' : activity.green, 'amber' : activity.amber, 'red' : activity.red, 'unplanned': activity.unplanned}">
-            Completed Ride
-            <p class="calSummaryText">Dist: {{Math.round(activity.completedDistance)}}km</p>
-            <p class="calSummaryText">NP: {{Math.round(activity.completednPwr)}}w</p>
-            <p class="calSummaryText">TSS: {{Math.round(activity.completedTss)}}</p>
-          </div>
-
-        </div>
-        <div id="adHocPlus" @click="addToDate();">
-          <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(day.date, true);" />
-        </div>
-
+    <div class="calendar" ref='cal'>
+      <div class="week" id="weekdays">
+        <div class="weekday">Monday</div>
+        <div class="weekday ">Tuesday</div>
+        <div class="weekday ">Wednesday</div>
+        <div class="weekday ">Thursday</div>
+        <div class="weekday ">Friday</div>
+        <div class="weekday ">Saturday</div>
+        <div class="weekday ">Sunday</div>
       </div>
-      <!-- </div> -->
+
+      <div id='loadingNotification' v-if='loading == "loading"' ref='loadingNotification'>
+        Loading
+      </div>
+
+      <div class="week" v-for="week in weeks" :key="week[0].date.toDateString()" :id="week[0].date">
+        <div class="day" v-for="day in week" :key="day.date.toDateString()">
+          <div class="dayDate" v-if="day.date.getDate()==1">
+            <!-- Add "monthFirst" class to span to make 1st of each month more visisble on the grid-->
+            <span class="monthFirst">{{day.date.getDate()}} {{day.date.toLocaleString('default', { month: 'short' })}}</span>
+          </div>
+          <div class="dayDate" v-else>
+            {{day.date.getDate()}}
+          </div>
+          <div v-for="activity in day.activities" :key="activity.id" class="activity" @click="fetchSingleRide(activity.id);">
+            <div v-if="activity.completion == 0" class='plannedRide'>
+              <p>Dist: {{Math.round(activity.plannedDistance)}}km</p>
+              <!-- <p>NP: {{Math.round(activity.np)}}w</p> -->
+              <!-- <p>TSS: {{Math.round(activity.plannedTss)}}</p> -->
+            </div>
+            <div v-if="activity.completion > 0 || activity.completion== -1" class="completed" :class="{ 'green' : activity.green, 'amber' : activity.amber, 'red' : activity.red, 'unplanned': activity.unplanned}">
+              <p class="calSummaryText">Dist: {{Math.round(activity.completedDistance)}}km</p>
+              <p class="calSummaryText">NP: {{Math.round(activity.completednPwr)}}w</p>
+              <p class="calSummaryText">TSS: {{Math.round(activity.completedTss)}}</p>
+            </div>
+
+          </div>
+          <div id="adHocPlus" @click="addToDate();">
+            <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(day.date, true); toggleSidebar();" />
+          </div>
+
+        </div>
+        <!-- </div> -->
+      </div>
     </div>
   </div>
-  <singleRideView v-if="singleRideVisible" v-on:closeSingleView="singleRideViewToggle(false)" @rideDeletionEvent="attachRidesToWeeks">
-  </singleRideView>
 
-  <adHocUpload v-if="adHocUplodVisible" :clickedDate="adHocDateProp" v-on:closeAdHocUpload="adHocUploadToggle(false)" v-on:closeAdHocUploadAndSave="adHocUploadToggle(false); refreshRides();">
 
-  </adHocUpload>
 
 </div>
 </template>
@@ -80,7 +85,9 @@ export default {
     loading: function() {
       return this.$store.getters.RidesLoading
     },
-
+    selectedRide: function() {
+      return this.$store.getters.SelectedRide
+    },
   },
   components: {
     navbar,
@@ -102,11 +109,27 @@ export default {
   },
   methods: {
     ...mapActions(["getRides", "getSingleRide", "ClearRideCache"]),
-    singleRideViewToggle(visible) {
-      this.singleRideVisible = visible;
+    singleRideViewToggle(visible, idMatch) {
+      console.log(idMatch)
+      if(!visible){
+        this.singleRideVisible = false;
+        this.toggleSidebar()
+      } else if(!this.singleRideVisible){
+        this.singleRideVisible = visible;
+        this.toggleSidebar()
+      } else if(idMatch){
+        this.singleRideVisible = false;
+        this.toggleSidebar()
+      }
     },
     adHocUploadToggle(visible) {
       this.adHocUplodVisible = visible;
+    },
+    toggleSidebar(){
+
+        this.$refs.sidebar.classList.toggle('sidebar_large');
+        this.$refs.calendar.classList.toggle('calendar_small')
+
     },
     async refreshRides() {
       var dates = {
@@ -123,11 +146,19 @@ export default {
     },
     async fetchSingleRide(id) {
       const rideId = id;
+      let idMatch;
+      if(this.selectedRide!=null){
+        if(rideId == this.selectedRide.id){
+          idMatch =true;
+        } else {
+          idMatch = false;
+        }
+      }
       try {
         const singleRideLoaded = await this.getSingleRide(rideId);
 
         if (singleRideLoaded == 200) {
-          this.singleRideViewToggle(true);
+          this.singleRideViewToggle(true, idMatch);
         }
       } catch (error) {
         console.log(error);
@@ -501,6 +532,7 @@ export default {
   },
   mounted() {
 
+
   }
 
 }
@@ -530,20 +562,48 @@ export default {
   background: #13203C;
 }
 
-
+.grid-container {
+  width: 90vw;
+  margin: 0 auto;
+  height: 75vh;
+  display: flex;
+  border: 2px solid rgba(0, 0, 0, .4);
+  transition: 1s ease;
+}
+.sidebar {
+  border-style: solid;
+  border-color: grey;
+  width: 0;
+  height: 100%;
+  display: inline-block;
+  background-color: #1D3460;
+  transition: 1s ease;
+  position: relative;
+}
 
 .calendar {
   border-style: solid;
   border-color: grey;
-  display: flex;
+  display: inline-block;
   flex-wrap: wrap;
-  max-height: 500px;
   overflow: scroll;
   overflow-x: hidden;
-  /* position: fixed; */
+  position: relative;
   /* top: 141px; */
+  width: 100%;
+  height: 100%;
+  transition: 1s ease;
 
 }
+
+.calendar_small {
+  width: 60%;
+}
+
+.sidebar_large {
+  width: 80%;
+}
+
 
 .week {
   display: flex;
@@ -564,7 +624,7 @@ export default {
   border-color: grey;
   border-width: thin;
   flex: 1;
-
+  width: 14.3%;
 }
 
 .day {
@@ -572,7 +632,7 @@ export default {
   border-color: grey;
   border-width: thin;
   flex: 1;
-  /* max-width: 14%; */
+  width: 14.3%;
   min-height: 75px;
 
 }
@@ -589,6 +649,11 @@ export default {
   border: solid;
   border-width: thin;
   margin: 15px;
+  max-width: 80%;
+}
+
+.activity p{
+  margin: 0;
 }
 
 .week:hover {

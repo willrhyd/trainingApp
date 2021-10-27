@@ -3,35 +3,51 @@
   <div id='loadingNotification' v-if='loading == "loading"' ref='loadingNotification'>
     Loading
   </div>
-  <div id="rideMap">
 
+  <div id="rideMap">
+    <googleMapLoader>
+      <template slot-scope="{ google, map }">
+        <googleMapPolyline
+          :google="google"
+          :map="map"
+
+        ></googleMapPolyline>
+      </template>
+    </googleMapLoader>
   </div>
-  <div v-if=" selectedRide.completion > 0 || selectedRide.completion== -1" id="completedData">
-    <span>Completed</span>
-    <div class="dataFieldLabels">
-      <label>Date:</label>
-      <label>Distance:</label>
-      <label>Time:</label>
-    </div>
-    <div class="dataFieldValues">
-      <input class="dataFieldValueInput" :placeholder="selectedRide.date"  />
-      <input class="dataFieldValueInput" :placeholder="selectedRide.completedDistance.toFixed(2)" />
-      <input class="dataFieldValueInput" :placeholder="secondsToTime(selectedRide.completedDuration)"  />
-    </div>
+
+
+  <div class="dataFieldLabels">
+    <label>Date:</label>
+    <label>Distance:</label>
+    <label>Time:</label>
+    <label>TSS:</label>
   </div>
-  <div v-if="selectedRide.completion == 0" id="plannedData">
-    <span>Planned</span>
-    <div class="dataFieldLabels">
-      <label>Date:</label>
-      <label>Distance:</label>
-      <label>Time:</label>
-    </div>
+  <div class="data-one">
+    <h3 class="data-heading">Planned</h3>
     <div class="dataFieldValues">
-      <input class="dataFieldValueInput" :placeholder="selectedRide.date"  />
+      <input class="dataFieldValueInput" :placeholder="selectedRide.date" />
       <input class="dataFieldValueInput" :placeholder="selectedRide.plannedDistance.toFixed(2)" />
-      <input class="dataFieldValueInput" :placeholder="secondsToTime(selectedRide.plannedDuration)"  />
+      <input class="dataFieldValueInput" :placeholder="secondsToTime(selectedRide.plannedDuration)" />
+      <input class="dataFieldValueInput" :placeholder="selectedRide.plannedTss" />
     </div>
   </div>
+  <div class="data-two">
+    <h3 class="data-heading">Completed</h3>
+    <div class="dataFieldValues" v-if="selectedRide.completion > 0 || selectedRide.completion== -1">
+      <input class="dataFieldValueInput" :placeholder="selectedRide.date" />
+      <input class="dataFieldValueInput" :placeholder="selectedRide.completedDistance.toFixed(2)" />
+      <input class="dataFieldValueInput" :placeholder="secondsToTime(selectedRide.completedDuration)" />
+      <input class="dataFieldValueInput" :placeholder="selectedRide.completedTss.toFixed(0)" />
+    </div>
+    <div class="dataFieldValues" v-else>
+      <input class="dataFieldValueInput" :placeholder="selectedRide.date" />
+      <input class="dataFieldValueInput" :placeholder="0" />
+      <input class="dataFieldValueInput" :placeholder="0" />
+      <input class="dataFieldValueInput" :placeholder="0" />
+    </div>
+  </div>
+
   <div id="buttonContainer">
     <button @click="singleRideViewClose()">Close</button>
     <button @click="singleRideViewClose()">Save and Close</button>
@@ -48,8 +64,15 @@
 import {
   mapActions
 } from "vuex";
+import googleMapLoader from './googleMapLoader.vue';
+import googleMapPolyline from "./googleMapPolyline";
+
 export default {
   name: "singleRideView",
+  components: {
+    googleMapLoader,
+    googleMapPolyline
+  },
   computed: {
     selectedRide: function() {
       return this.$store.getters.SelectedRide
@@ -93,48 +116,85 @@ export default {
       return pad(hours, 2) + ':' + pad(minutes, 2) + ':' + pad(seconds, 2);
     }
   },
+  mounted(){
+    console.log(this.map)
+  }
 }
 </script>
 
 <style>
 .single-view {
-  border-color: black;
-  border-width: thin;
-  border-style: solid;
   background: white;
-  padding: 2.5%;
-  position: absolute;
+  display: grid;
+  grid-template-columns: 2.5% 25% 35% 35% 2.5%;
+  grid-template-rows: 50% 40% 10%;
+  min-height: 75vh;
 
-  right: 30%;
-  top: 30%;
-  z-index: 2;
+
 }
 
-#data{
+.data-one {
 
+  display: grid;
+  grid-column-start: 3;
+  grid-row: 2;
+  margin: auto;
+
+}
+
+.data-two {
+
+  display: grid;
+  grid-column: 4;
+  grid-row: 2;
+  margin: auto;
+
+}
+
+
+.data-heading {
+  display: block;
+  margin: 0;
 }
 
 .dataFieldLabels {
-  display: inline-block;
+  display: grid;
+  grid-column-start: 2;
+  grid-row-start: 2;
+  padding-top: 25px;
   text-align: left;
-}
-
-.dataFieldValues {
-  display: inline-block;
-  text-align: right;
+  margin: auto;
 }
 
 .dataFieldLabels label {
-  padding: 0 20px 0 0;
   display: block;
+  width: 10%;
+  margin: 1.8px 0;
+}
+
+.dataFieldValues {
+  display: inline;
+
 }
 
 .dataFieldValues input {
-  display: block;
+  width: 80%;
+}
+
+#rideMap {
+  display: grid;
+  grid-column: 2/ span 3;
+  grid-row: 1 / span 1;
+  margin: 15px auto 5px auto;
+  width: 90%;
+
 }
 
 #buttonContainer {
-  margin: 120px auto 5px auto;
+  display: grid;
+  grid-column: 2/ span 3;
+  grid-row: 2 / span 1;
+  margin: 15px auto 5px auto;
 }
 
 #loadingNotification {
@@ -148,6 +208,4 @@ export default {
   right: 40%;
   top: 40%;
 }
-
-
 </style>

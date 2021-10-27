@@ -241,6 +241,7 @@ app.get('/showRide/:id', async function(req, res) {
       console.log(err);
     }
     var rideObj = new Object();
+        rideObj.data = docs[0].data;
         rideObj.completion = docs[0].completion;
         rideObj.date = docs[0].date;
         rideObj.completedDistance = docs[0].completedDistance;

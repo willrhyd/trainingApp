@@ -1,10 +1,8 @@
 <template>
 <div class="single-view">
 
-  <div id="rideMap">
 
-  </div>
-  <div  id="data">
+  <div  class="data-one">
     <div class="dataFieldLabels">
       <label>Date:</label>
       <label>Distance:</label>
@@ -80,43 +78,32 @@ created(){
 
 <style>
 .single-view {
-  border-color: black;
-  border-width: thin;
-  border-style: solid;
-  background: white;
-  padding: 2.5%;
-  position: absolute;
 
-  right: 30%;
-  top: 30%;
-  z-index: 1;
+  background: white;
 }
 
 #data{
 
 }
 
-.dataFieldLabels {
+/* .dataFieldLabels {
   display: inline-block;
+  padding: 0 20px 0 0;
   text-align: left;
-}
+} */
 
 .dataFieldValues {
   display: inline-block;
   text-align: right;
 }
 
-.dataFieldLabels label {
-  padding: 0 20px 0 0;
-  display: block;
-}
 
-.dataFieldValues input {
-  display: block;
-}
 
 #buttonContainer {
-  margin: 120px auto 5px auto;
+  display: inline;
+  grid-column: 1 / span 3;
+  grid-row: 3 / span 1;
+  margin: 15px auto 5px auto;
 }
 
 #loadingNotification {
