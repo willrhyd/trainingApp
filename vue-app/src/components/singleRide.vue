@@ -5,12 +5,14 @@
   </div>
 
   <div id="rideMap">
-    <googleMapLoader>
+    <googleMapLoader
+      :centre="selectedRide.latLngArr[0]"
+    >
       <template slot-scope="{ google, map }">
         <googleMapPolyline
           :google="google"
           :map="map"
-
+          :path="selectedRide.latLngArr"
         ></googleMapPolyline>
       </template>
     </googleMapLoader>
@@ -84,6 +86,7 @@ export default {
   data() {
     return {
       d: null,
+      path:this.selectedRide.latLngArr,
     }
   },
   methods: {
@@ -116,9 +119,7 @@ export default {
       return pad(hours, 2) + ':' + pad(minutes, 2) + ':' + pad(seconds, 2);
     }
   },
-  mounted(){
-    console.log(this.map)
-  }
+
 }
 </script>
 

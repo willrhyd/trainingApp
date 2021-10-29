@@ -6,11 +6,10 @@
 
   <div class="grid-container">
     <div class="sidebar" ref="sidebar">
-      <singleRideView v-if="singleRideVisible" v-on:closeSingleView="singleRideViewToggle(false); " @rideDeletionEvent="attachRidesToWeeks">
+      <singleRideView v-if="singleRideVisible" v-on:closeSingleView="toggleSidebar(false); " @rideDeletionEvent="attachRidesToWeeks">
       </singleRideView>
 
-      <adHocUpload v-if="adHocUplodVisible" :clickedDate="adHocDateProp" v-on:closeAdHocUpload="adHocUploadToggle(false); toggleSidebar();" v-on:closeAdHocUploadAndSave="adHocUploadToggle(false); refreshRides();">
-
+      <adHocUpload v-if="adHocUploadVisible" :clickedDate="adHocDateProp" v-on:closeAdHocUpload="toggleSidebar(false);" v-on:closeAdHocUploadAndSave="toggleSidebar(false); refreshRides();">
       </adHocUpload>
 
     </div>
@@ -52,8 +51,8 @@
             </div>
 
           </div>
-          <div id="adHocPlus" @click="addToDate();">
-            <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(day.date, true); toggleSidebar();" />
+          <div id="adHocPlus">
+            <font-awesome-icon :icon="['far', 'plus-square']" size="2x" @click="adHocUploadPlusClick(day.date);" />
           </div>
 
         </div>
@@ -61,9 +60,6 @@
       </div>
     </div>
   </div>
-
-
-
 </div>
 </template>
 
@@ -94,71 +90,95 @@ export default {
     singleRideView,
     adHocUpload,
   },
-  // props: ['adHocDateProp'],
+
   data() {
     return {
       calendarScroll: null,
       weeks: [],
       view: null,
       // loadingRides: false,
+      prevClickedDate: null,
+      adHocDateProp: null,
+      sidebarVisible: false,
       singleRideVisible: false,
-      adHocUplodVisible: false,
+      adHocUploadVisible: false,
       visibleStart: null,
       visibleEnd: null,
     }
   },
   methods: {
-    ...mapActions(["getRides", "getSingleRide", "ClearRideCache"]),
-    singleRideViewToggle(visible, idMatch) {
-      console.log(idMatch)
-      if(!visible){
+    ...mapActions(["getRides", "getSingleRide", "ClearRideCache", "ClearSingleRide"]),
+    singleRideViewToggle(idMatch) {
+
+      if (!this.singleRideVisible) {
+        this.singleRideVisible = true;
+      } else if (idMatch) {
         this.singleRideVisible = false;
-        this.toggleSidebar()
-      } else if(!this.singleRideVisible){
-        this.singleRideVisible = visible;
-        this.toggleSidebar()
-      } else if(idMatch){
-        this.singleRideVisible = false;
-        this.toggleSidebar()
       }
     },
-    adHocUploadToggle(visible) {
-      this.adHocUplodVisible = visible;
-    },
-    toggleSidebar(){
 
-        this.$refs.sidebar.classList.toggle('sidebar_large');
-        this.$refs.calendar.classList.toggle('calendar_small')
-
+    toggleSidebar(visible) {
+      this.$refs.sidebar.classList.toggle('sidebar_large');
+      this.$refs.cal.classList.toggle('calendar_small');
+      this.sidebarVisible = visible;
+      if (!visible) {
+        this.adHocUploadVisible = false;
+        this.singleRideVisible = false;
+      }
     },
     async refreshRides() {
       var dates = {
         dateOne: new Date(this.weeks[0][0].date),
-        dateTwo: new Date(this.weeks[this.weeks.length-1][6].date),
+        dateTwo: new Date(this.weeks[this.weeks.length - 1][6].date),
       }
       // Query rides between dateOne and dateTwo and store in Local Storage
       await this.getRides(dates);
       this.attachRidesToWeeks();
     },
-    adHocUploadPlusClick(clickedDate, visible) {
-      this.adHocUploadToggle(visible)
+
+    adHocUploadPlusClick(clickedDate) {
       this.adHocDateProp = clickedDate;
+
+      // If single ride is already being viewed, don't toggle sidebar just hide single ride and show adhoc upload
+      if (!this.sidebarVisible && !this.adHocUploadVisible) {
+        this.adHocUploadVisible = true;
+        this.toggleSidebar(true);
+        this.prevClickedDate = clickedDate;
+        console.log(`Single Ride Visible ${this.singleRideVisible} AdHoc Visible ${this.adHocUploadVisible}`)
+      } else if (this.sidebarVisible && clickedDate != this.prevClickedDate) {
+        this.singleRideVisible = false;
+        this.adHocUploadVisible = true;
+        this.prevClickedDate = clickedDate;
+      } else if (clickedDate == this.prevClickedDate) {
+        this.adHocUploadVisible = false;
+        this.toggleSidebar(false);
+      }
+
     },
     async fetchSingleRide(id) {
       const rideId = id;
       let idMatch;
-      if(this.selectedRide!=null){
-        if(rideId == this.selectedRide.id){
-          idMatch =true;
+      if (this.selectedRide != null) {
+        if (rideId == this.selectedRide.id) {
+          idMatch = true;
         } else {
           idMatch = false;
         }
       }
       try {
         const singleRideLoaded = await this.getSingleRide(rideId);
-
         if (singleRideLoaded == 200) {
-          this.singleRideViewToggle(true, idMatch);
+          // Once the ride is loaded work out if the sidebar is visible or displaying another single ride and
+          // either toggle the sidebar or load the newly clicked ride into the sidebar.
+          if (!this.sidebarVisible && this.selectedRide) {
+            this.singleRideViewToggle(idMatch);
+            this.toggleSidebar(true);
+          }
+          if (idMatch) {
+            this.singleRideVisible = false;
+            this.toggleSidebar(false);
+            await this.ClearSingleRide()
+          }
         }
       } catch (error) {
         console.log(error);
@@ -267,7 +287,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i -2)
+                day.date.setDate(this.view.getDate() - i - 2)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -298,7 +318,7 @@ export default {
                   activities: [],
                   attached: false
                 }
-                day.date.setDate(this.view.getDate() - i -4)
+                day.date.setDate(this.view.getDate() - i - 4)
                 days.unshift(day);
               }
               this.view.setDate(this.view.getDate() - 7)
@@ -530,10 +550,6 @@ export default {
       console.log(err)
     }
   },
-  mounted() {
-
-
-  }
 
 }
 </script>
@@ -570,6 +586,7 @@ export default {
   border: 2px solid rgba(0, 0, 0, .4);
   transition: 1s ease;
 }
+
 .sidebar {
   border-style: solid;
   border-color: grey;
@@ -601,7 +618,7 @@ export default {
 }
 
 .sidebar_large {
-  width: 80%;
+  width: 40%;
 }
 
 
@@ -652,7 +669,7 @@ export default {
   max-width: 80%;
 }
 
-.activity p{
+.activity p {
   margin: 0;
 }
 
@@ -677,7 +694,7 @@ export default {
   width: 25px;
 }
 
-.calSummaryText{
+.calSummaryText {
   margin-bottom: 0;
 }
 

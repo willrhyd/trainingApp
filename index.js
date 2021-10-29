@@ -78,10 +78,10 @@ app.use(session({
   cookie: {
     // Comment out secure and samesite for local environment testing. Change 'trainingappserver.uk' to 'localhost'.
     name: 'trainingApp',
-    secure: true,
+    // secure: true,
     maxAge: 100 * 60 * 60 * 24,
-    sameSite: 'none',
-    domain: 'trainingappserver.uk',
+    // sameSite: 'none',
+    domain: 'localhost',
     httpOnly: false
   },
   unset: 'destroy',
@@ -240,8 +240,22 @@ app.get('/showRide/:id', async function(req, res) {
     if (err) {
       console.log(err);
     }
+    // console.log(docs[0].data[0])
     var rideObj = new Object();
-        rideObj.data = docs[0].data;
+    var latLngArr = [];
+    if(docs[0].data){
+      // Need to construct array for the lat lng data for google map polyline
+        const rideData = JSON.parse(docs[0].data);
+        // console.log(rideData)
+        
+        latLngArr.push({lat: rideData.start_position_lat, lng: rideData.start_position_long});
+        rideData.laps.forEach(lap => {
+          lap.records.forEach( record => {
+            latLngArr.push({lat: record.position_lat, lng: record.position_long});
+          });
+        });
+      }
+        rideObj.latLngArr = latLngArr;
         rideObj.completion = docs[0].completion;
         rideObj.date = docs[0].date;
         rideObj.completedDistance = docs[0].completedDistance;

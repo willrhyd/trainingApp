@@ -14,6 +14,12 @@ import { Loader } from '@googlemaps/js-api-loader';
 
 export default {
   name: 'googleMapLoader',
+  props:{
+    centre: {
+      type: Array,
+      required: true,
+    }
+  },
   data() {
     return {
       google: null,
@@ -22,7 +28,7 @@ export default {
   },
   async mounted(){
     const loader = new Loader({
-      apiKey: 'AIzaSyChIdw0EIui2Hp3Zy0JkUoG2QT55jSnGdE',
+      apiKey: process.env.VUE_APP_MAPS_API_KEY,
       version: "weekly",
       libraries: ["places"]
     });
@@ -30,18 +36,15 @@ export default {
     // this.google = loader;
 
     const mapOptions = {
-      center: {
-        lat: 0,
-        lng: 0
-      },
-      zoom: 4
+      center: this.centre,
+      zoom: 10
     };
     try{
       await loader.load().then(google => {
         this.google = google;
         this.map = new google.maps.Map(document.querySelector('.google-map'), mapOptions);
       })
-      
+
     } catch(e){
       console.log(e);
     }

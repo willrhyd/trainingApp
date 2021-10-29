@@ -1,6 +1,5 @@
 <template>
-<div class="single-view">
-
+<div class="adHoc-view">
 
   <div  class="data-one">
     <div class="dataFieldLabels">
@@ -71,20 +70,20 @@ export default {
       },
 },
 created(){
-  console.log(this.clickedDate)
+
 }
 }
 </script>
 
 <style>
-.single-view {
-
+.adHoc-view {
   background: white;
+  display: grid;
+  grid-template-columns: 2.5% 25% 35% 35% 2.5%;
+  grid-template-rows: 50% 40% 10%;
+  min-height: 75vh;
 }
 
-#data{
-
-}
 
 /* .dataFieldLabels {
   display: inline-block;
