@@ -52,7 +52,7 @@
 
   <div id="buttonContainer">
     <button @click="singleRideViewClose()">Close</button>
-    <button @click="singleRideViewClose()">Save and Close</button>
+    <!-- <button @click="singleRideViewClose()">Save and Close</button> -->
     <button @click="deleteOneRide(selectedRide.id)">Delete</button>
   </div>
 
