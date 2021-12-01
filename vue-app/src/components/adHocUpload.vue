@@ -4,8 +4,8 @@
   <textarea id="description" ref="description" v-model="formData.description" placeholder="Activity description...">
   </textarea>
   <div id="sportIconContainer">
-    <button type="button" class="sportIcon" @click="selectSport('cyccling', $event)"><font-awesome-icon :icon="['fas', 'biking']" size="2x" ref="cyclingIcon" pointer-events="none"/></button>
-    <button type="button" class="sportIcon" @click="selectSport('run', $event)"><font-awesome-icon :icon="['fas', 'running']" size="2x" ref="runningIcon" pointer-events="none"/> </button>
+    <button type="button" class="sportIcon" @click="selectSport('cycling', $event)"><font-awesome-icon :icon="['fas', 'biking']" size="2x" ref="cyclingIcon" pointer-events="none"/></button>
+    <button type="button" class="sportIcon" @click="selectSport('running', $event)"><font-awesome-icon :icon="['fas', 'running']" size="2x" ref="runningIcon" pointer-events="none"/> </button>
     
     
   </div>

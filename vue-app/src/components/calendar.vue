@@ -47,8 +47,8 @@
               <!-- <p>TSS: {{Math.round(activity.plannedTss)}}</p> -->
             </div>
             <div v-if="activity.completion > 0 || activity.completion== -1" class="completed" :class="{ 'green' : activity.green, 'amber' : activity.amber, 'red' : activity.red, 'unplanned': activity.unplanned}">
-              <font-awesome-icon v-if="activity.sport=='cycling'" :icon="['fas', 'biking']" size="2x" pointer-events="none"/>
-              <font-awesome-icon v-if="activity.sport=='running'" :icon="['fas', 'running']" size="2x" pointer-events="none"/>
+              <font-awesome-icon v-if="activity.sport =='cycling'" :icon="['fas', 'biking']" size="2x" pointer-events="none"/>
+              <font-awesome-icon v-if="activity.sport =='running'" :icon="['fas', 'running']" size="2x" pointer-events="none"/>
               <p class="calSummaryText">Dist: {{Math.round(activity.completedDistance)}}km</p>
               <p class="calSummaryText">NP: {{Math.round(activity.completednPwr)}}w</p>
               <p class="calSummaryText">TSS: {{Math.round(activity.completedTss)}}</p>
