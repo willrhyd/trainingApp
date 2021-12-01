@@ -20,9 +20,11 @@
     "moment-timezone": "^0.5.33",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.5",
+    "vue-carousel": "^0.18.0",
     "vue-chartjs": "^3.5.1",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.5.2",
+    "vue-snap": "^1.0.0-alpha.6",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^4.0.0"
   },

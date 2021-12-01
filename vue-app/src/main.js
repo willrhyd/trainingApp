@@ -7,14 +7,20 @@ import './axios.js'
 import store from './store/store.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlusSquare } from '@fortawesome/free-regular-svg-icons';
+import { faRunning, faBiking } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import VueMoment from "vue-moment";
 import {moment} from "moment-timezone";
+import VueCarousel from 'vue-carousel';
+
 
 
 Vue.use(VueMoment, { moment });
+Vue.use(VueCarousel);
 
 library.add(faPlusSquare);
+library.add(faRunning);
+library.add(faBiking);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 

@@ -3,6 +3,18 @@
   <div id='loadingNotification' v-if='loading == "loading"' ref='loadingNotification'>
     Loading
   </div>
+  <input id="singleRideTitle" :placeholder="selectedRide.title" />
+  
+  <carousel id="carousel" :perPage="1">
+  <slide>
+    Slide 1 Content
+  </slide>
+  <slide >
+  </slide>
+  <slide>
+    
+  </slide>
+</carousel>
 
   <div id="rideMap">
     <googleMapLoader
@@ -50,7 +62,11 @@
     </div>
   </div>
 
-  <div id="buttonContainer">
+
+    <textarea name="" id="descriptionSingleRide" cols="40" rows="5" v-model="selectedRide.description" ></textarea>
+  
+
+  <div id="buttonContainerSingleRide">
     <button @click="singleRideViewClose()">Close</button>
     <!-- <button @click="singleRideViewClose()">Save and Close</button> -->
     <button @click="deleteOneRide(selectedRide.id)">Delete</button>
@@ -68,12 +84,16 @@ import {
 } from "vuex";
 import googleMapLoader from './googleMapLoader.vue';
 import googleMapPolyline from "./googleMapPolyline";
+import {Carousel, Slide} from 'vue-carousel';
+
 
 export default {
   name: "singleRideView",
   components: {
     googleMapLoader,
-    googleMapPolyline
+    googleMapPolyline,
+    Carousel,
+    Slide
   },
   computed: {
     selectedRide: function() {
@@ -128,17 +148,26 @@ export default {
   background: white;
   display: grid;
   grid-template-columns: 2.5% 25% 35% 35% 2.5%;
-  grid-template-rows: 50% 40% 10%;
+  grid-template-rows: 2.5% 5% 2.5% 35% 2.5% 7.5% 2.5% 17.5% 17.5% 5% 2.5%;
   min-height: 75vh;
 
 
+}
+
+#carousel{
+  display: none;
+}
+
+#singleRideTitle{
+  grid-column: 2 / 5;
+  grid-row: 2 / 2;
 }
 
 .data-one {
 
   display: grid;
   grid-column-start: 3;
-  grid-row: 2;
+  grid-row: 7;
   margin: auto;
 
 }
@@ -147,7 +176,7 @@ export default {
 
   display: grid;
   grid-column: 4;
-  grid-row: 2;
+  grid-row: 7;
   margin: auto;
 
 }
@@ -161,7 +190,7 @@ export default {
 .dataFieldLabels {
   display: grid;
   grid-column-start: 2;
-  grid-row-start: 2;
+  grid-row-start: 7;
   padding-top: 25px;
   text-align: left;
   margin: auto;
@@ -185,17 +214,29 @@ export default {
 #rideMap {
   display: grid;
   grid-column: 2/ span 3;
-  grid-row: 1 / span 1;
+  grid-row: 3 / span 3;
   margin: 15px auto 5px auto;
   width: 90%;
 
 }
 
-#buttonContainer {
-  display: grid;
-  grid-column: 2/ span 3;
-  grid-row: 2 / span 1;
+#descriptionSingleRide{
+  
+  grid-column: 2 / span 3;
+  grid-row: 9 / span 1;
   margin: 15px auto 5px auto;
+  
+}
+
+#buttonContainerSingleRide {
+
+  grid-column: 2/ span 3;
+  grid-row: 10 / span 2;
+  
+}
+
+#buttonContainerSingleRide button{
+  margin: 5px 15px;
 }
 
 #loadingNotification {

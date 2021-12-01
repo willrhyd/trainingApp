@@ -32,22 +32,31 @@ export default {
               data: null,
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
-              borderWidth: 3
+              borderWidth: 3,
+              yAxisID: "CTL"
             },
             {
               label: "Projected CTL",
               data: null,
               borderColor: "#36495d",
               borderDash: [10,5],
-              borderWidth: 3
-
+              borderWidth: 3,
+              yAxisID: "CTL"
             },
             {
               label: "ATL",
               data: null,
-              backgroundColor: "red",
-              borderColor: "#36495d",
-              borderWidth: 3
+              borderColor: "red",
+              borderWidth: 3,
+              yAxisID: "ATL"
+            },
+            {
+              label: "Projected ATL",
+              data: null,
+              borderColor: "red",
+              borderDash: [10,5],
+              borderWidth: 3,
+              yAxisID: "ATL"
             },
             {
               label: "TSB",
@@ -70,11 +79,21 @@ export default {
           scales: {
             yAxes: [
               {
+                id: "CTL",
                 ticks: {
                   beginAtZero: true,
                   padding: 25
                 }
+              },
+              {
+                id: "ATL",
+                position: "right",
+                ticks: {
+                  beginAtZero: false,
+                  padding: 25
+                }
               }
+
             ]
           }
         }
@@ -88,12 +107,14 @@ export default {
     // Fetch initial PMC data
     async fetchPmc(){
       // const ctx = document.getElementById('pmc');
-      var labels = [];
-      var completedCtl = [];
-      var projectedCtl = [];
+      let labels = [];
+      let completedCtl = [];
+      let projectedCtl = [];
+      let completedAtl = [];
+      let projectedAtl = [];
 
       try{
-        // The API returns a 2d array containing CTL, then ATL, then TSB values
+        // The API returns an array of "day" objects which holds the date labels, CTL, ATL, and TSB values
         let pmc = await axios.get('/pmc/' + this.user + "." + this.forecastDays);
         let startDate = new Date(pmc.data[0].date)
         // let endDate = new Date(pmc.data[pmc.data.length-1].date)
@@ -105,9 +126,12 @@ export default {
 
           labels.unshift(pmc.data[todayPosn - i].date)
           completedCtl.unshift(pmc.data[todayPosn - i].ctl);
-          projectedCtl.unshift(pmc.data[todayPosn - i].ctl);
+          projectedCtl.unshift(pmc.data[todayPosn - i].ctl); //build the projected data from the first date too
+          completedAtl.unshift(pmc.data[todayPosn - i].atl);
+          projectedAtl.unshift(pmc.data[todayPosn - i].atl);
         }
         this.pmcData.data.datasets[0].data = completedCtl;
+        this.pmcData.data.datasets[2].data = completedAtl;
 
         // Push Data entries to the projected portion of the PMC
         for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
@@ -115,9 +139,10 @@ export default {
 
           labels.push(pmc.data[i].date)
           projectedCtl.push(pmc.data[i].ctl);
+          projectedAtl.push(pmc.data[i].atl);
         }
         this.pmcData.data.datasets[1].data = projectedCtl;
-
+        this.pmcData.data.datasets[3].data = projectedAtl;
       } catch(err) {
         console.log(err)
       }
@@ -126,12 +151,14 @@ export default {
     // Redraw chart based on user selected periods
     async changeView() {
 
-      var labels = [];
-      var completedCtl = [];
-      var projectedCtl = [];
+      let labels = [];
+      let completedCtl = [];
+      let projectedCtl = [];
+      let completedAtl = [];
+      let projectedAtl = [];
 
       try{
-        // The API returns a 2d array containing CTL, then ATL, then TSB values
+        
         let pmc = await axios.get('/pmc/' + this.user + "." + this.forecastDays);
         let startDate = new Date(pmc.data[0].date)
         // let endDate = new Date(pmc.data[pmc.data.length-1].date)
@@ -144,8 +171,11 @@ export default {
           labels.unshift(pmc.data[todayPosn - i].date)
           completedCtl.unshift(pmc.data[todayPosn - i].ctl);
           projectedCtl.unshift(pmc.data[todayPosn - i].ctl);
+          completedAtl.unshift(pmc.data[todayPosn - i].atl);
+          projectedAtl.unshift(pmc.data[todayPosn - i].atl);
         }
         this.pmcData.data.datasets[0].data = completedCtl;
+        this.pmcData.data.datasets[2].data = completedAtl;
 
         // Push Data entries to the projected portion of the PMC
         for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
@@ -153,8 +183,10 @@ export default {
 
           labels.push(pmc.data[i].date)
           projectedCtl.push(pmc.data[i].ctl);
+          projectedAtl.push(pmc.data[i].atl);
         }
         this.pmcData.data.datasets[1].data = projectedCtl;
+        this.pmcData.data.datasets[3].data = projectedAtl;
 
       } catch(err) {
         console.log(err)
@@ -176,6 +208,8 @@ export default {
 
 <style>
 
-
+#pmc{
+  
+}
 
 </style>

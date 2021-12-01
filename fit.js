@@ -7,12 +7,12 @@ function parseFIT(req, res, next) {
   req.parsedFiles = [];
   fs.readdir(`./temp/${req.user.username}`, (err, files) => {
 
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
+    for (let i = 0; i < files.length; i++) {
+      let file = files[i];
       console.log(`./temp/${req.user.username}/${file}`);
       fs.readFile(`./temp/${req.user.username}/${file}`, function(err, content) {
         // Create a EasyFit instance (options argument is optional)
-        var easyFit = new EasyFit({
+        let easyFit = new EasyFit({
           force: true,
           speedUnit: 'km/h',
           lengthUnit: 'km',
@@ -52,7 +52,7 @@ function parseFIT(req, res, next) {
 
 function getNP(activity) {
   remove_stops(activity);
-  var np = rideNormalisedPower(activity);
+  let np = rideNormalisedPower(activity);
   return np;
 }
 
@@ -69,7 +69,7 @@ function remove_stops(activity) {
 
 function de_Lap_power(activity) {
   // console.log(activity);
-  var block_power = [];
+  let block_power = [];
   // console.log(activity.sessions.laps[i].records)
   // console.log(activity.sessions[0]);
   for (i in activity.sessions[0].laps) {
@@ -87,16 +87,16 @@ function de_Lap_power(activity) {
 }
 
 function rideNormalisedPower(activity) {
-  var power_array = de_Lap_power(activity);
-  var total_rolling_power = 0;
-  var rolling_average = 0;
-  var rolling_average_array = [];
-  var rolling_average_powered_array = [];
-  var total_rolling_average_powered = 0;
-  var avg_powered_values = 0;
-  var normalized_power;
-  var j = 0;
-  var i;
+  let power_array = de_Lap_power(activity);
+  let total_rolling_power = 0;
+  let rolling_average = 0;
+  let rolling_average_array = [];
+  let rolling_average_powered_array = [];
+  let total_rolling_average_powered = 0;
+  let avg_powered_values = 0;
+  let normalized_power;
+  let j = 0;
+  let i;
 
   // console.log(power_array)
   for (i = 0; i < power_array.length; i++) {
@@ -106,10 +106,6 @@ function rideNormalisedPower(activity) {
         total_rolling_power += power_array[j];
       }
       rolling_average = total_rolling_power / 30;
-      //
-      // if(i=28){
-      //   console.log(rolling_average);
-      // }
       rolling_average_array.push(rolling_average);
       total_rolling_power = 0;
     }
@@ -147,7 +143,7 @@ function checkForRide(rides, checkDate) {
   const today = new Date();
   today.setHours(0, 0, 0);
 
-  for (var j = 0; j < rides.length; j++) {
+  for (let j = 0; j < rides.length; j++) {
     rideDate = new Date(Date.parse(rides[j].date));
     rideDate.setHours(0, 0, 0);
 
@@ -172,6 +168,14 @@ function checkForRide(rides, checkDate) {
   return check;
 }
 
+
+function rollingAverage (avg, new_sample) {
+
+  avg -= avg / N;
+  avg += new_sample / N;
+
+  return avg;
+}
 // Doesn't handle multiple rides on one day yet
 function buildPmcArray(rides, projection) {
 
@@ -190,54 +194,83 @@ function buildPmcArray(rides, projection) {
   }
 
   // Normal execution if at least one ride saved
-  var chartStart = new Date(Date.parse(rides[0].date));
-  var chartEnd = new Date();
+  let chartStart = new Date(Date.parse(rides[0].date));
+  let chartEnd = new Date();
 
   const forecast = Number(projection);
   chartEnd.setDate(chartEnd.getDate() + (forecast));
 
-  var dates = [];
-  var data = [];
-  var ctlToday = 0;
-  var ctlYesterday = 0;
+  let dates = [];
+  let data = [];
+  let ctlToday = 0;
+  let ctlYesterday = 0;
+  let tssArray = [];
+  let atlToday = 0;
+  let atlYesterday;
+  let sumOfPreviousSevenDaysTSS = 0;
 
-  var dateOptions = {
+  let dateOptions = {
     year: "numeric",
     month: "short",
     day: "numeric"
   };
 
-  for (var d = new Date(chartStart); d <= chartEnd; d.setDate(d.getDate() + 1)) {
+  for (let d = new Date(chartStart); d <= chartEnd; d.setDate(d.getDate() + 1)) {
     d.setHours(0, 0, 0);
-
 
     // For each day, check whether there's a ride that matches that day
     const rideCheck = checkForRide(rides, d);
-    console.log(rideCheck)
+    
 
 
-    // Build the data array with date and ctl value.
+    // Build the data array with date, atl, tsb, and ctl values.
     if (rideCheck.match == 1) {
+
       ctlToday = ctlYesterday + ((rideCheck.tss - ctlYesterday) / (42));
+      
+      tssArray.push(rideCheck.tss)
+
+      if(tssArray.length > 7){
+        for (let i = 1; i <= 7; i++){
+          sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
+        }
+        atlToday = atlYesterday + (sumOfPreviousSevenDaysTSS -atlYesterday ) / 7
+      }
+      
       data.push({
         date: d.toLocaleDateString("en-gb", dateOptions),
-        ctl: ctlToday
+        ctl: ctlToday,
+        atl: atlToday,
       });
 
       ctlYesterday = ctlToday;
+      atlYesterday = atlToday;
+      sumOfPreviousSevenDaysTSS = 0;
     }
 
     if (rideCheck.match == 0) {
       ctlToday = ctlYesterday + ((0 - ctlYesterday) / (42));
+      tssArray.push(0)
+      if(tssArray.length >= 7){
+        for (let i = 1; i <= 7; i++){
+          sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
+        }
+        atlToday = atlYesterday + ( sumOfPreviousSevenDaysTSS - atlYesterday ) / 7
+      }
+
+
       data.push({
         date: d.toLocaleDateString("en-gb", dateOptions),
-        ctl: ctlToday
+        ctl: ctlToday,
+        atl: atlToday,
       });
       ctlYesterday = ctlToday;
+      atlYesterday = atlToday;
+      sumOfPreviousSevenDaysTSS = 0;
     }
-
+    
   }
-
+  console.log(tssArray)
   return data;
 }
 

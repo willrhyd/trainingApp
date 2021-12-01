@@ -40,11 +40,15 @@
           </div>
           <div v-for="activity in day.activities" :key="activity.id" class="activity" @click="fetchSingleRide(activity.id);">
             <div v-if="activity.completion == 0" class='plannedRide'>
+              <font-awesome-icon v-if="activity.sport=='cycling'" :icon="['fas', 'biking']" size="2x" pointer-events="none"/>
+              <font-awesome-icon v-if="activity.sport=='running'" :icon="['fas', 'running']" size="2x" pointer-events="none"/>
               <p>Dist: {{Math.round(activity.plannedDistance)}}km</p>
               <!-- <p>NP: {{Math.round(activity.np)}}w</p> -->
               <!-- <p>TSS: {{Math.round(activity.plannedTss)}}</p> -->
             </div>
             <div v-if="activity.completion > 0 || activity.completion== -1" class="completed" :class="{ 'green' : activity.green, 'amber' : activity.amber, 'red' : activity.red, 'unplanned': activity.unplanned}">
+              <font-awesome-icon v-if="activity.sport=='cycling'" :icon="['fas', 'biking']" size="2x" pointer-events="none"/>
+              <font-awesome-icon v-if="activity.sport=='running'" :icon="['fas', 'running']" size="2x" pointer-events="none"/>
               <p class="calSummaryText">Dist: {{Math.round(activity.completedDistance)}}km</p>
               <p class="calSummaryText">NP: {{Math.round(activity.completednPwr)}}w</p>
               <p class="calSummaryText">TSS: {{Math.round(activity.completedTss)}}</p>
@@ -232,35 +236,42 @@ export default {
       }
     },
     async handleScroll() {
-      // console.log("Scroll Top: " + this.$refs.cal.scrollTop)
-      // console.log("Scroll Height: " + this.$refs.cal.scrollHeight)
-      // If calendar.scrollTop is above 200px then topOfCal is false
       let topOfCal = this.$refs.cal.scrollTop < 50;
       let bottomOfCal = this.$refs.cal.scrollTop > this.$refs.cal.scrollHeight - 600;
       try {
         // If less than 50px from top then do the following:
         if (topOfCal) {
+          
+          
           await this.buildWeekGridBack()
+          // await this.destroyWeekGridForward()
         }
         if (bottomOfCal) {
-          this.buildWeekGridForward()
+          
+          // await this.destroyWeekGridBack()
+          await this.buildWeekGridForward()
+          
+          
         }
       } catch (err) {
         console.log(err);
       }
     },
     async buildWeekGridBack() {
-
+      let buildLength;
       if (this.view == null) {
         this.setInitialView(new Date());
+        buildLength = 8;
       } else {
         this.setInitialView(this.weeks[0][0].date)
+        buildLength = 4;
       }
 
-      var i;
-      var j;
+      
       try {
-        for (j = 0; j < 4; j++) {
+        let i;
+        let j;
+        for (j = 0; j < buildLength; j++) {
           var days = [];
           switch (this.view.getDay()) {
             case 1:
@@ -396,11 +407,10 @@ export default {
     },
     async buildWeekGridForward() {
       this.setInitialView(this.weeks[this.weeks.length - 1][6].date)
-      var i;
-      var j;
       try {
-        for (j = 0; j < 4; j++) {
-          var days = [];
+        for (let j = 0; j < 4; j++) {
+          let days = [];
+          let i;
           switch (this.view.getDay()) {
             case 1:
 
@@ -533,15 +543,25 @@ export default {
       } catch (err) {
         console.log(err)
       }
-    }
+    },
     // Need weekGrid destructor functions to stop the grid getting too big and slowing the app down
+    async destroyWeekGridForward() {
+        for (let j = 0; j < 4; j++) {
+          this.weeks.shift();
+        }
+    },
+    async destroyWeekGridBack() {
+        for (let j = 0; j < 4; j++) {
+          this.weeks.pop();
+        }
+    }
   },
   async created() {
     try {
       // Build the initial grid of dates
       await this.buildWeekGridBack();
       await this.buildWeekGridForward();
-      this.$refs.cal.scrollTop = 100;
+      this.$refs.cal.scrollTop = 600;
       this.$refs.cal.addEventListener('scroll', this.handleScroll)
 
       this.visibleEnd = new Date(this.weeks[this.weeks.length - 1][0].date)
