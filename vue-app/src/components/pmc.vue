@@ -116,17 +116,22 @@ export default {
       try{
         // The API returns an array of "day" objects which holds the date labels, CTL, ATL, and TSB values
         let pmc = await axios.get('/pmc/' + this.user + "." + this.forecastDays);
+        
         let startDate = new Date(pmc.data[0].date)
+        
         // let endDate = new Date(pmc.data[pmc.data.length-1].date)
         let today = new Date()
         const todayPosn = Math.round((today - startDate)/86400000);
 
+      
         // Push data entries to the completed portion of the PMC
-        for (let i = 0; i <= this.trailingDays; i++){
+        for (let i = 0; i < this.trailingDays ; i++){
 
+          if(i==todayPosn-1){break;}//needed to prevent undefined array referencing
+          
           labels.unshift(pmc.data[todayPosn - i].date)
           completedCtl.unshift(pmc.data[todayPosn - i].ctl);
-          projectedCtl.unshift(pmc.data[todayPosn - i].ctl); //build the projected data from the first date too
+          projectedCtl.unshift(pmc.data[todayPosn - i].ctl); 
           completedAtl.unshift(pmc.data[todayPosn - i].atl);
           projectedAtl.unshift(pmc.data[todayPosn - i].atl);
         }
@@ -134,8 +139,8 @@ export default {
         this.pmcData.data.datasets[2].data = completedAtl;
 
         // Push Data entries to the projected portion of the PMC
-        for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
-          // var arrLen = pmc.data.length
+        for (let i = todayPosn+1; i <= (pmc.data.length - 1); i++){
+      
 
           labels.push(pmc.data[i].date)
           projectedCtl.push(pmc.data[i].ctl);
@@ -168,6 +173,8 @@ export default {
         // Push data entries to the completed portion of the PMC
         for (let i = 0; i <= this.trailingDays; i++){
 
+          if(i==todayPosn-1){break;}//needed to prevent undefined array referencing
+
           labels.unshift(pmc.data[todayPosn - i].date)
           completedCtl.unshift(pmc.data[todayPosn - i].ctl);
           projectedCtl.unshift(pmc.data[todayPosn - i].ctl);
@@ -178,12 +185,12 @@ export default {
         this.pmcData.data.datasets[2].data = completedAtl;
 
         // Push Data entries to the projected portion of the PMC
-        for (let i = todayPosn; i <= (pmc.data.length - 1); i++){
+        for (let i = todayPosn+1; i <= (pmc.data.length - 1); i++){
           // var arrLen = pmc.data.length
 
           labels.push(pmc.data[i].date)
           projectedCtl.push(pmc.data[i].ctl);
-          projectedAtl.push(pmc.data[i].atl);
+          projectedAtl.push(pmc.data[i-6].atl);
         }
         this.pmcData.data.datasets[1].data = projectedCtl;
         this.pmcData.data.datasets[3].data = projectedAtl;

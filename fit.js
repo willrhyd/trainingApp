@@ -233,7 +233,7 @@ function buildPmcArray(rides, projection) {
       if(tssArray.length > 7){
         for (let i = 1; i <= 7; i++){
           sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
-        }
+        } 
         atlToday = atlYesterday + (sumOfPreviousSevenDaysTSS -atlYesterday ) / 7
       }
       

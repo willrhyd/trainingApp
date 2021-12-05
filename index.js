@@ -443,7 +443,7 @@ app.get('/pmc/:user.:projection', ensureAuthenticated, async function(req, res) 
       user: req.user.username
     }).sort({
       date: 'asc'
-    });
+    }).allowDiskUse()
 
       const projection = req.params.projection;
       let data = fit.pmc(rides, projection);

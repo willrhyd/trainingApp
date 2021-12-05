@@ -114,7 +114,7 @@ mounted(){
   background: white;
   display: grid;
   grid-template-columns: 2.5% 25% 35% 35% 2.5%;
-  grid-template-rows: 2.5% 5% 2.5% 35% 2.5% 7.5% 2.5% 40% 2.5%;
+  grid-template-rows: 2.5% 5% 2.5% 35% 2.5% 7.5% 2.5% 35% 5% 2.5%;
   min-height: 75vh;
 }
 
@@ -133,7 +133,7 @@ mounted(){
 .adHocDataFields {
   display: flex;
   grid-column: 2 / span 3;
-  grid-row: 8;
+  grid-row: 7 / span 2;
   
 
 }
@@ -194,8 +194,8 @@ mounted(){
 #buttonContainer {
   align-items: flex-end;
   display: flex;
-  grid-column: 1 / span 4;
-  grid-row: 8 ;
+  grid-column: 3 / span 2;
+  grid-row: 9 / span 1 ;
 }
 
 #buttonContainer button{
