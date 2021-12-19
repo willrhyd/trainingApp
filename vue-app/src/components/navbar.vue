@@ -31,11 +31,16 @@ export default {
     return{
       userSettingsVisible: false,
       submittingRides: false,
+      // isLoggedIn: false,
     }
   },
   computed: {
      isLoggedIn : function(){return this.$store.getters.isAuthenticated},
      user : function(){return this.$store.getters.StateUser}
+   },
+  
+   mounted(){
+     this.isLoggedIn = function(){return this.$store.getters.isAuthenticated}
    },
   methods: {
     ridesSubmitting(submitting) {

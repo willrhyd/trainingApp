@@ -3,7 +3,7 @@
 <template>
   <div>
     <navbar/>
-    <pmc></pmc>
+    <pmc ></pmc>
   </div>
 </template>
 
@@ -23,7 +23,9 @@ import navbar from './navbar.vue'
 </script>
 
 <style>
-
+pmc{
+  max-width: 80%;
+}
 
 
 </style>

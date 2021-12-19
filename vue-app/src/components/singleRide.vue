@@ -18,7 +18,7 @@
 
   <div id="rideMap">
     <googleMapLoader
-      :centre="selectedRide.latLngArr[0]"
+      :centre="selectedRide.latLngArr[1]"
     >
       <template slot-scope="{ google, map }">
         <googleMapPolyline

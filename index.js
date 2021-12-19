@@ -213,7 +213,9 @@ async function uploadDBActivity(req, res, next) {
             $gt: d1,
             $lt: d2,
           },
-          user: req.user.username
+          completion: 0,
+          sport: sport,
+          user: req.user.username,
         };
 
         let plannedActivity;
@@ -441,9 +443,7 @@ app.get('/pmc/:user.:projection', ensureAuthenticated, async function(req, res) 
   try {
     var rides = await Activity.find({
       user: req.user.username
-    }).sort({
-      date: 'asc'
-    }).allowDiskUse()
+    })
 
       const projection = req.params.projection;
       let data = fit.pmc(rides, projection);

@@ -152,7 +152,7 @@ function checkForRide(rides, checkDate) {
       if (rideDate.toDateString() == checkDate.toDateString()) {
         // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
           check.match = 1;
-          check.tss = rides[j].plannedTss;
+          check.tss += rides[j].plannedTss;
       }
     }
     if( checkDate < today){
@@ -160,7 +160,7 @@ function checkForRide(rides, checkDate) {
         // If there's a matched ride then return match as 1 and use "completedTss" as the ctl builder
         if(rides[j].completedTss){
           check.match = 1;
-          check.tss = rides[j].completedTss;
+          check.tss += rides[j].completedTss;
         }
         }
       }
@@ -168,14 +168,6 @@ function checkForRide(rides, checkDate) {
   return check;
 }
 
-
-function rollingAverage (avg, new_sample) {
-
-  avg -= avg / N;
-  avg += new_sample / N;
-
-  return avg;
-}
 // Doesn't handle multiple rides on one day yet
 function buildPmcArray(rides, projection) {
 
@@ -193,6 +185,19 @@ function buildPmcArray(rides, projection) {
     return data;
   }
 
+  // comparison function for array sort
+  function dynamicSort(property) {
+    var sortOrder = 1;
+    
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
+  rides.sort(dynamicSort("date"));
+
+
+
   // Normal execution if at least one ride saved
   let chartStart = new Date(Date.parse(rides[0].date));
   let chartEnd = new Date();
@@ -200,14 +205,15 @@ function buildPmcArray(rides, projection) {
   const forecast = Number(projection);
   chartEnd.setDate(chartEnd.getDate() + (forecast));
 
-  let dates = [];
+  
   let data = [];
   let ctlToday = 0;
   let ctlYesterday = 0;
   let tssArray = [];
   let atlToday = 0;
-  let atlYesterday;
+  let atlYesterday = 0;
   let sumOfPreviousSevenDaysTSS = 0;
+  let tsb;
 
   let dateOptions = {
     year: "numeric",
@@ -221,54 +227,34 @@ function buildPmcArray(rides, projection) {
     // For each day, check whether there's a ride that matches that day
     const rideCheck = checkForRide(rides, d);
     
-
-
     // Build the data array with date, atl, tsb, and ctl values.
     if (rideCheck.match == 1) {
-
       ctlToday = ctlYesterday + ((rideCheck.tss - ctlYesterday) / (42));
-      
       tssArray.push(rideCheck.tss)
-
-      if(tssArray.length > 7){
-        for (let i = 1; i <= 7; i++){
-          sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
-        } 
-        atlToday = atlYesterday + (sumOfPreviousSevenDaysTSS -atlYesterday ) / 7
-      }
-      
-      data.push({
-        date: d.toLocaleDateString("en-gb", dateOptions),
-        ctl: ctlToday,
-        atl: atlToday,
-      });
-
-      ctlYesterday = ctlToday;
-      atlYesterday = atlToday;
-      sumOfPreviousSevenDaysTSS = 0;
     }
-
     if (rideCheck.match == 0) {
       ctlToday = ctlYesterday + ((0 - ctlYesterday) / (42));
       tssArray.push(0)
-      if(tssArray.length >= 7){
-        for (let i = 1; i <= 7; i++){
-          sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
-        }
-        atlToday = atlYesterday + ( sumOfPreviousSevenDaysTSS - atlYesterday ) / 7
-      }
-
-
-      data.push({
-        date: d.toLocaleDateString("en-gb", dateOptions),
-        ctl: ctlToday,
-        atl: atlToday,
-      });
-      ctlYesterday = ctlToday;
-      atlYesterday = atlToday;
-      sumOfPreviousSevenDaysTSS = 0;
     }
+
+    for (let i = 1; i <= 7; i++){
+      if(i > tssArray.length){break;}
+      sumOfPreviousSevenDaysTSS += tssArray[tssArray.length - i]
+    } 
+
+    atlToday = atlYesterday + (tssArray[tssArray.length-1] - atlYesterday ) / 7
+    tsb = ctlYesterday-atlYesterday
     
+    data.push({
+      date: d.toLocaleDateString("en-gb", dateOptions),
+      ctl: ctlToday,
+      atl: atlToday,
+      tsb: tsb,
+    });
+
+    ctlYesterday = ctlToday;
+    atlYesterday = atlToday;
+    sumOfPreviousSevenDaysTSS = 0;
   }
   console.log(tssArray)
   return data;
