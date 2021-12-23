@@ -16,7 +16,6 @@ This is a personal project I've been working on with the aim of replicating func
   - [Useful resources](#useful-resources)
 - [Author](#author)
 
-
 ## Overview
 The app allows a user to sign up and create an account. Once logged in you can upload .fit files from a suitable device. The app will process the data and render the ride at the appropriate point in the calendar screen, calculating Normalised Power and Training Stress Score. From there you can click on activities to get some more detailed information, including a map of your route via the Google Maps API. I've only tested with power-enabled cycling files (as that's all I need for myself). You can also upload manual activities (a run or a bike ride), which depending on if they're in the future or not will show up as a planned activity or a completed activity. You can upload over a planned activity with the file upload.
 
@@ -38,7 +37,7 @@ Other plans for the page include better scrutiny of single ride data such as pea
 - Vue.js
 - Node (Express)
 
-### my-process
+### My Process
 
 This has been a learning process for me so I've just focused on getting something usable and taking it step by step. It's far from perfect but hosting it costs $7 /month versus $20 /month for a Premium subscription to Training Peaks, plus I'm learning something so overall if it does what I need I'm happy. Overall it's taken about 3 months to get to this point from zero framework knowledge and a general full stack course from Udemy for the Node bits. I've worked on it a couple of hours in the evenings after my (non-dev) job.
 
