@@ -115,8 +115,8 @@ async function wrapper() {
   const page = await browser.newPage();
 
   const details = {
-    email: "will.haynes@virgin.net",
-    pwd: "Herbalife24"
+    email: ,
+    pwd: 
   };
   await logInGConnect(details, page);
   await navToActivities(page);
