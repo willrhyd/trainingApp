@@ -17,7 +17,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "express-sessions": "^1.0.6",
-    "fit-file-parser": "^1.9.0",
+    "fit-file-parser": "^1.9.3",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
     "garmin-connect": "^1.4.1",

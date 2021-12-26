@@ -1,6 +1,6 @@
 // jshint esversion:8
 
-const EasyFit = require('./node_modules/easy-fit/dist/easy-fit.js').default;
+const EasyFit = require('./node_modules/fit-file-parser/dist/fit-parser.js').default;
 const fs = require('fs');
 
 function parseFIT(req, res, next) {
@@ -27,14 +27,13 @@ function parseFIT(req, res, next) {
           if (error) {
             console.log(error);
           } else {
-            // Difficulties building the array because callbacks only returning once the for loop has completed,
-            // maybe a promise would work better?
+            console.log(data);
             req.parsedFiles.push(data.activity)
             if (req.parsedFiles.length == files.length) {
               next();
             }
           }
-          // console.log(req.parsedFiles[0]);
+          
         });
       });
       fs.unlink(`./temp/${req.user.username}/${file}`, (err) => {

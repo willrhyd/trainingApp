@@ -14,7 +14,7 @@
       <button>Log in</button>
     </form>
     <p>
-      Not registered?<a href='/register'> Sign Up</a>
+      Not registered?<a href='#/register'> Sign Up</a>
     </p>
   </div>
 </template>
